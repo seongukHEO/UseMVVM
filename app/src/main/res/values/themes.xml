@@ -1,0 +1,21 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.FirstUseMVVMProject" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your light theme here. -->
+        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+
+        <!--상단 상태바 색상 -->
+        <item name="colorPrimary">@color/toolBarColor</item>
+        <item name="colorPrimaryDark">@color/toolBarColor</item>
+        <item name="android:windowLightStatusBar">true</item>
+
+    </style>
+
+    <style name="Theme.FirstUseMVVMProject" parent="Base.Theme.FirstUseMVVMProject" />
+
+    <style name="TextInputLayoutStyle" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeColor">@color/lastColor</item>
+        <item name="counterTextAppearance">@color/lastColor</item>
+        <item name="hintTextColor">@color/lastColor</item>
+    </style>
+</resources>
