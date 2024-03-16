@@ -48,16 +48,15 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                android:hint="휴대폰 번호 입력"
+                android:layout_marginTop="20dp"
+                android:hint="휴대폰 번호"
                 app:endIconMode="clear_text">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/textSearchPWNumber"
+                    android:id="@+id/textSearchPwNumber"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="number"
-                    android:text="@={searchPwViewModel.textSearchPWNumber}"/>
+                    android:inputType="number" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <Button

@@ -37,6 +37,7 @@
                 android:padding="15dp">
 
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/textJoinNameLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="이름"
@@ -46,10 +47,11 @@
                         android:id="@+id/textJoinName"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@={joinViewModel.textJoinName}"/>
+                        android:text="@={joinViewModel.textJoinName}" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/textJoinNumberLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="13dp"
@@ -57,14 +59,15 @@
                     app:endIconMode="clear_text">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/textSearchPWNumber"
+                        android:id="@+id/textJoinNumber"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="number"
-                        android:text="@={joinViewModel.textJoinNumber}"/>
+                        android:text="@={joinViewModel.textJoinNumber}" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/textJoinIdLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="13dp"
@@ -75,10 +78,11 @@
                         android:id="@+id/textJoinId"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@={joinViewModel.textJoinId}"/>
+                        android:text="@={joinViewModel.textJoinId}" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/textJoinPwLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="13dp"
@@ -90,10 +94,20 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="text|textPassword"
-                        android:text="@={joinViewModel.textJoinPw}"/>
+                        android:text="@={joinViewModel.textJoinPw}" />
+
+                    <TextView
+                        android:id="@+id/textView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="특수문자를 입력해주세요!"
+                        android:textColor="#DC4040"
+                        android:visibility="gone" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/textJoinCheckPwLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="13dp"
@@ -105,7 +119,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="text|textPassword"
-                        android:text="@={joinViewModel.textJoinCheckPw}"/>
+                        android:text="@={joinViewModel.textJoinCheckPw}" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <Button
