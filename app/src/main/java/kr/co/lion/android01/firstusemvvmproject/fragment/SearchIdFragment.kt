@@ -81,7 +81,7 @@ class SearchIdFragment : Fragment() {
             val number = searchIdViewModel!!.textSearchIdNumber.value!!
 
             if (number.trim().isEmpty()){
-                mainActivity.showDialog("휴대폰 번호 입력 오류", "휴대폰 번호에 등록된 아이디가 없습니다"){ dialogInterface: DialogInterface, i: Int ->
+                mainActivity.showDialog("휴대폰 번호 입력 오류", "휴대폰 번호를 입력해주세요"){ dialogInterface: DialogInterface, i: Int ->
                     mainActivity.showSoftInput(textSearchIdNumber, mainActivity)
                 }
                 return false
