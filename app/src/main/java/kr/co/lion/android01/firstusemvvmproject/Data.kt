@@ -19,6 +19,16 @@ enum class FragmentName(var str: String){
     SEARCH_ID_FRAGMENT("SearchIdFragment"),
     SEARCH_PW_FRAGMENT("SearchPwFragment")
 }
+enum class FragmentMemoName(var str: String){
+    ALL_MEMO_FRAGMENT("AllMemoFragment"),
+    INPUT_MEMO_FRAGMENT("InputMemoFragment"),
+    SHOW_MEMO_FRAGMENT("ShowMemoFragment"),
+    MODIFY_MEMO_FRAGMENT("ModifyMemoFragment")
+}
+
+
+
+
 //Dialog를 보여주는 확장함수
 fun Context.showDialog(title:String, message:String, listener: (DialogInterface, Int) -> Unit){
     var dialog = MaterialAlertDialogBuilder(this)
