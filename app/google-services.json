@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "794592435749",
+    "project_id": "practicememo-4774c",
+    "storage_bucket": "practicememo-4774c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:794592435749:android:d5efaef75f161e7f2569cc",
+        "android_client_info": {
+          "package_name": "kr.co.lion.android01.firstusemvvmproject"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDXekw3ub8IqeZdTnY3SGcv0H0LUBkYT6g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

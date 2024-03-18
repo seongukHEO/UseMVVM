@@ -9,11 +9,16 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kr.co.lion.android01.firstusemvvmproject.FragmentName
 import kr.co.lion.android01.firstusemvvmproject.MainActivity
 import kr.co.lion.android01.firstusemvvmproject.R
+import kr.co.lion.android01.firstusemvvmproject.dao.UserDao
 import kr.co.lion.android01.firstusemvvmproject.databinding.FragmentJoinBinding
 import kr.co.lion.android01.firstusemvvmproject.hideSoftInput
+import kr.co.lion.android01.firstusemvvmproject.model.UserModel
 import kr.co.lion.android01.firstusemvvmproject.showDialog
 import kr.co.lion.android01.firstusemvvmproject.showSoftInput
 import kr.co.lion.android01.firstusemvvmproject.viewModel.JoinViewModel
@@ -183,8 +188,35 @@ class JoinFragment : Fragment() {
                 }
                 return
             }
-            mainActivity.removeFragment(FragmentName.JOIN_FRAGMENT)
+            saveUserData()
 
+        }
+    }
+
+    private fun saveUserData(){
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
+            //사용자 번호 시퀀스 값을 가져온다
+            val userSequence = UserDao.getUserSequence()
+            //시퀀스 값을 1 증가시켜 덮어 씌운다
+            UserDao.updateUserSequence(userSequence + 1)
+
+            //저장할 데이터를 가져온다
+            val userIdx = userSequence + 1
+            val name = joinViewModel.textJoinName.value!!
+            val number = joinViewModel.textJoinNumber.value!!
+            val userId = joinViewModel.textJoinId.value!!
+            val userPw = joinViewModel.textJoinPw.value!!
+
+            //저장할 데이터를 객체에 담는다
+            val userModel = UserModel(userIdx, name, number, userId, userPw)
+
+            //사용자 정보를 저장한다
+            UserDao.insertUserData(userModel)
+
+            mainActivity.showDialog("가입 완료", "가입이 완료되었습니다"){ dialogInterface: DialogInterface, i: Int ->
+                mainActivity.removeFragment(FragmentName.JOIN_FRAGMENT)
+
+            }
         }
     }
 }
