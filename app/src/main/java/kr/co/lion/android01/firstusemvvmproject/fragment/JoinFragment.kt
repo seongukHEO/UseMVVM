@@ -31,6 +31,12 @@ class JoinFragment : Fragment() {
 
     lateinit var joinViewModel: JoinViewModel
 
+    // 아이디 중복 확인 검사를 했는지..
+    // true면 아이디 중복 확인 검사를 완료한 것으로 취급한다.
+    var checkUserIdExist = false
+
+
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -47,6 +53,7 @@ class JoinFragment : Fragment() {
         settingToolBar()
         setEvent()
         setView()
+        checkId()
         return fragmentJoinBinding.root
     }
 
@@ -76,6 +83,7 @@ class JoinFragment : Fragment() {
         }
     }
 
+
     //화면 설정
     private fun setView() {
         fragmentJoinBinding.apply {
@@ -103,6 +111,10 @@ class JoinFragment : Fragment() {
             }
             textJoinPw.addTextChangedListener {
                 textJoinPwLayout.error = null
+            }
+            // 아이디 입력요소의 값을 변경하면 중복확인 여부 변수값을 false로 설정한다.
+            fragmentJoinBinding.textJoinId.addTextChangedListener {
+                checkUserIdExist = false
             }
         }
     }
@@ -171,6 +183,12 @@ class JoinFragment : Fragment() {
             val checkPw = joinViewModel!!.textJoinCheckPw.value!!
 
             //아이디는 중복 파이어 베이스를 이용한 중복 체크이므로 나중에!
+            if(checkUserIdExist == false){
+                mainActivity.showDialog("아이디 중복 확인", "아이디 중복 확인을 해주세요"){ dialogInterface: DialogInterface, i: Int ->
+                    mainActivity.showSoftInput(textJoinId, mainActivity)
+                }
+                return
+            }
 
             //비밀번호 특수문자 입력 받기
             val specialText = Pattern.compile("[!@#$%^&*)(+=.,;:]")
@@ -219,6 +237,31 @@ class JoinFragment : Fragment() {
             }
         }
     }
+
+    //아이디 중복 검사
+    private fun checkId() {
+        fragmentJoinBinding.apply {
+            buttonCheck.setOnClickListener {
+                viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
+                    checkUserIdExist = UserDao.checkUserIdExist(joinViewModel?.textJoinId?.value!!)
+
+                    if (checkUserIdExist == false){
+                        joinViewModel?.textJoinId?.value = ""
+                        mainActivity.showDialog("아이디 중복 오류", "이미 사용중인 아이디 입니다\n다른 아이디를 선택해주세요"){ dialogInterface: DialogInterface, i: Int ->
+                            mainActivity.showSoftInput(textJoinId, mainActivity)
+                        }
+                    }else if (checkUserIdExist == true){
+                        mainActivity.showDialog("성공", "사용 가능한 아이디 입니다"){ dialogInterface: DialogInterface, i: Int ->
+                            mainActivity.hideSoftInput(mainActivity)
+
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
 }
 
 

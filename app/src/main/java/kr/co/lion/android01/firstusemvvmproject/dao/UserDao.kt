@@ -62,6 +62,67 @@ class UserDao {
             job1.join()
         }
 
+        //입력한 아이디가 이미 저장이 되어있는지 확인
+        suspend fun checkUserIdExist(joinUserId:String) : Boolean{
+
+            var chk = false
+
+            val job1 = CoroutineScope(Dispatchers.IO).launch {
+                //컬렉션에 접근할 수 있는 객체를 가져온다
+                val collectionReference = Firebase.firestore.collection("Sequence")
+                //필드의 이름 값 형태로 넣어준다
+                //WhereEqualTo : 같은 것
+                val queryShapshot = collectionReference.whereEqualTo("userId", joinUserId).get().await()
+                //반환되는 리스트에 담긴 문서 객체가 없다면 존재하는 아이디로 취급한다
+                chk = queryShapshot.isEmpty
+            }
+            job1.join()
+            return chk
+
+        }
+
     }
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
