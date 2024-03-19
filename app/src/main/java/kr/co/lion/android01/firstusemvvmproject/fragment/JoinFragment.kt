@@ -250,7 +250,12 @@ class JoinFragment : Fragment() {
                         mainActivity.showDialog("아이디 중복 오류", "이미 사용중인 아이디 입니다\n다른 아이디를 선택해주세요"){ dialogInterface: DialogInterface, i: Int ->
                             mainActivity.showSoftInput(textJoinId, mainActivity)
                         }
-                    }else if (checkUserIdExist == true){
+                    }
+                    if (textJoinId.text!!.isEmpty()){
+                        mainActivity.showDialog("아이디 입력 오류", "아이디를 입력해주세요"){ dialogInterface: DialogInterface, i: Int ->
+                            mainActivity.showSoftInput(textJoinId, mainActivity)
+                        }
+                    } else if (checkUserIdExist == true){
                         mainActivity.showDialog("성공", "사용 가능한 아이디 입니다"){ dialogInterface: DialogInterface, i: Int ->
                             mainActivity.hideSoftInput(mainActivity)
 

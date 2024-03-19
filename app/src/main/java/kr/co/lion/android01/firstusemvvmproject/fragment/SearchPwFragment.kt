@@ -7,9 +7,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kr.co.lion.android01.firstusemvvmproject.FragmentName
 import kr.co.lion.android01.firstusemvvmproject.MainActivity
 import kr.co.lion.android01.firstusemvvmproject.R
+import kr.co.lion.android01.firstusemvvmproject.dao.UserDao
 import kr.co.lion.android01.firstusemvvmproject.databinding.FragmentSearchPwBinding
 import kr.co.lion.android01.firstusemvvmproject.hideSoftInput
 import kr.co.lion.android01.firstusemvvmproject.showDialog
@@ -59,7 +63,7 @@ class SearchPwFragment : Fragment() {
             buttonSearchPW.setOnClickListener {
                 val chk = checkOK()
                 if (chk == true){
-                    mainActivity.removeFragment(FragmentName.SEARCH_PW_FRAGMENT)
+                    getUserPw()
                     mainActivity.hideSoftInput(mainActivity)
                 }
             }
@@ -97,7 +101,74 @@ class SearchPwFragment : Fragment() {
             return true
         }
     }
+
+    //비밀번호 가져오기
+    private fun getUserPw(){
+        fragmentSearchPwBinding.apply {
+            val number = searchPwViewModel!!.textSearchPWNumber.value!!
+
+            val job1 = viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main){
+                val searchPwNumber = UserDao.getUserDataByNumber(number)
+
+                if (searchPwNumber == null || searchPwNumber.userId != searchPwViewModel!!.textSearchPwUserid.value){
+                    mainActivity.showDialog("정보 오류", "입력하신 정보에 해당하는 계정이 존재하지 않습니다"){ dialogInterface: DialogInterface, i: Int ->
+                        mainActivity.showSoftInput(textSearchPwUserid, mainActivity)
+                    }
+                }else{
+                    textShowUserPw.text = "비밀번호 : ${searchPwNumber.userPw}"
+                }
+
+            }
+
+
+        }
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

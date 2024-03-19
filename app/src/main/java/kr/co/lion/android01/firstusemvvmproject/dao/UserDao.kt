@@ -81,6 +81,28 @@ class UserDao {
 
         }
 
+        //사용자의 전화번호를 통해 사용자 정보를 가져오는 메서드
+        //null을 허용하는 이유는 null이 나올경우 그 아이디에 맞는 정보가 없는 것이다
+        suspend fun getUserDataByNumber(number:String): UserModel? {
+            //사용자 객체를 담을 변수
+            var userModel:UserModel? = null
+
+            val job1 = CoroutineScope(Dispatchers.IO).launch {
+                //UserData 컬렉션 접근 객체
+                val collectionReference = Firebase.firestore.collection("Sequence")
+                //number 필드가 매개변수로 들어오는 Number와 같은 문서들을 가져온다
+                val querySnapshot = collectionReference.whereEqualTo("number", number).get().await()
+                //만약 가져온 것이 있다면?
+                if (querySnapshot.isEmpty == false){
+                    //가져온 문서 객체들이 들어있는 리스트에서 첫 번째 객체를 추출
+                    userModel = querySnapshot.documents[0].toObject(UserModel::class.java)
+                }
+            }
+            job1.join()
+
+            return userModel
+        }
+
     }
 
 }
