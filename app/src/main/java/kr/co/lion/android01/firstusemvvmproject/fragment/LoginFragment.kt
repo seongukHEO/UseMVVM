@@ -10,12 +10,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kr.co.lion.android01.firstusemvvmproject.FragmentName
 import kr.co.lion.android01.firstusemvvmproject.MainActivity
 import kr.co.lion.android01.firstusemvvmproject.R
 import kr.co.lion.android01.firstusemvvmproject.activity.LoginActivity
+import kr.co.lion.android01.firstusemvvmproject.dao.UserDao
 import kr.co.lion.android01.firstusemvvmproject.databinding.FragmentLoginBinding
 import kr.co.lion.android01.firstusemvvmproject.showDialog
 import kr.co.lion.android01.firstusemvvmproject.showSoftInput
@@ -61,7 +62,7 @@ class LoginFragment : Fragment() {
             buttonMainLogin.setOnClickListener {
                 val chk = checkOK()
                 if (chk == true){
-                    lottieUse()
+                    loginCheck()
                 }
 
             }
@@ -103,10 +104,39 @@ class LoginFragment : Fragment() {
         }
     }
 
+    //로그인한다
+    private fun loginCheck(){
+        fragmentLoginBinding.apply {
+
+            var userId = loginViewModel!!.textMainId.value!!
+            var userPw = loginViewModel!!.textMainPw.value!!
+
+            val job1 = viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
+                val loginUserModel = UserDao.getUserDataByUserId(userId)
+                //아이디가 null이라면?
+                if (loginUserModel == null){
+                    mainActivity.showDialog("로그인 오류", "존재 하지 않는 아이디 입니다"){ dialogInterface: DialogInterface, i: Int ->
+                        mainActivity.showSoftInput(textMainId, mainActivity)
+                    }
+                }else{
+                    //아이디는 유효한데 비번이 틀릴경우
+                    if (userPw != loginUserModel.userPw){
+                        mainActivity.showDialog("로그인 오류", "존재 하지 않는 비밀번호 입니다"){ dialogInterface: DialogInterface, i: Int ->
+                            mainActivity.showSoftInput(textMainPW, mainActivity)
+                        }
+                    }else{
+                        lottieUse()
+                    }
+                }
+            }
+        }
+    }
+
     //Lottie를 사용하자
     private fun lottieUse(){
         fragmentLoginBinding.apply {
             lottieLinearLayout.visibility = View.VISIBLE
+            val userId = loginViewModel!!.textMainId.value!!
 
             lottieMain.repeatCount = 0
             lottieMain.loop(false)
@@ -118,6 +148,7 @@ class LoginFragment : Fragment() {
                 override fun onAnimationEnd(animation: Animator) {
                     //애니메이션이 종료되면 이동
                     val newIntent = Intent(mainActivity, LoginActivity::class.java)
+                    newIntent.putExtra("userId", userId)
                     startActivity(newIntent)
                 }
 

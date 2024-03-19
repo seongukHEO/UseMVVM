@@ -103,6 +103,27 @@ class UserDao {
             return userModel
         }
 
+        //사용자 아이디로 유저의 정보 가져오기
+        suspend fun getUserDataByUserId(userid:String) : UserModel? {
+            //사용자의 정보를 담을 객체
+            var usermodel:UserModel? = null
+
+            val job1 = CoroutineScope(Dispatchers.IO).launch {
+                //UserData 컬렉션 접근 객체
+                val collectionReference = Firebase.firestore.collection("Sequence")
+                //userId 필드가 매개변수로 들어오는 userId와 같은 문서들을 가져온다
+                val querySnapshot = collectionReference.whereEqualTo("userId", userid).get().await()
+                //만약 가져온 것이 있다면?
+                if (querySnapshot.isEmpty == false){
+                    //가져온 문서 객체들이 들어있는 리스트에서 첫 번째 객체를 추출
+                    usermodel = querySnapshot.documents[0].toObject(UserModel::class.java)
+                }
+            }
+            job1.join()
+
+            return usermodel
+        }
+
     }
 
 }

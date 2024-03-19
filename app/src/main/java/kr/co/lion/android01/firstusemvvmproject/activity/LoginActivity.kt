@@ -26,7 +26,10 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         activityLoginBinding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(activityLoginBinding.root)
-        replaceFragment(FragmentMemoName.ALL_MEMO_FRAGMENT, false , false, null)
+        val userId = intent.getStringExtra("userId")
+        val bundle = Bundle()
+        bundle.putString("userId", userId)
+        replaceFragment(FragmentMemoName.ALL_MEMO_FRAGMENT, false , false, bundle)
     }
 
     // 지정한 Fragment를 보여주는 메서드
