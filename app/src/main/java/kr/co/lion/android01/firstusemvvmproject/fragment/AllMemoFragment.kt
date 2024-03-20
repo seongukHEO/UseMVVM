@@ -7,6 +7,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.divider.MaterialDividerItemDecoration
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kr.co.lion.android01.firstusemvvmproject.FragmentMemoName
@@ -14,6 +17,7 @@ import kr.co.lion.android01.firstusemvvmproject.R
 import kr.co.lion.android01.firstusemvvmproject.activity.LoginActivity
 import kr.co.lion.android01.firstusemvvmproject.dao.UserDao
 import kr.co.lion.android01.firstusemvvmproject.databinding.FragmentAllMemoBinding
+import kr.co.lion.android01.firstusemvvmproject.databinding.RowMainBinding
 import kr.co.lion.android01.firstusemvvmproject.viewModel.AllMemoViewModel
 
 class AllMemoFragment : Fragment() {
@@ -37,6 +41,7 @@ class AllMemoFragment : Fragment() {
 
         loginActivity = activity as LoginActivity
         settingToolBar()
+        initView()
 
         return fragmentAllMemoBinding.root
     }
@@ -69,9 +74,47 @@ class AllMemoFragment : Fragment() {
         }
     }
 
-    inner class RecyclerView{
+    private fun initView(){
+        fragmentAllMemoBinding.apply {
+            memoRecyclerView.apply {
+                adapter = MemoRecyclerView()
+                layoutManager = LinearLayoutManager(loginActivity)
+                val deco = MaterialDividerItemDecoration(loginActivity, MaterialDividerItemDecoration.VERTICAL)
+                addItemDecoration(deco)
 
-        inner class ViewHolderClass()
+            }
+        }
+    }
+
+    inner class MemoRecyclerView : RecyclerView.Adapter<MemoRecyclerView.ViewHolderClass>(){
+
+        inner class ViewHolderClass(rowMainBinding: RowMainBinding): RecyclerView.ViewHolder(rowMainBinding.root){
+            var rowMainBinding:RowMainBinding
+
+            init {
+                this.rowMainBinding = rowMainBinding
+
+                this.rowMainBinding.root.layoutParams = ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+            }
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolderClass {
+            var rowMainBinding = RowMainBinding.inflate(layoutInflater)
+            var viewHolder = ViewHolderClass(rowMainBinding)
+            return viewHolder
+        }
+
+        override fun getItemCount(): Int {
+            return 100
+        }
+
+        override fun onBindViewHolder(holder: ViewHolderClass, position: Int) {
+            holder.rowMainBinding.textViewtitleAllMemo.text = "메모"
+            holder.rowMainBinding.textViewDateAllMemo.text = "2024/03/21"
+        }
     }
 }
 
