@@ -8,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kr.co.lion.android01.firstusemvvmproject.FragmentMemoName
@@ -31,6 +30,9 @@ class InputMemoFragment : Fragment() {
 
     lateinit var inputMemoViewModel: InputMemoViewModel
 
+    //아이디 객체를 담은 변수
+    var userId2 = ""
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
@@ -38,6 +40,8 @@ class InputMemoFragment : Fragment() {
         inputMemoViewModel = InputMemoViewModel()
         fragmentInputMemoBinding.inputMemoViewModel = inputMemoViewModel
         fragmentInputMemoBinding.lifecycleOwner = this
+
+        userId2 = arguments?.getString("userId")!!
 
         loginActivity = activity as LoginActivity
         settingToolBar()
@@ -78,7 +82,7 @@ class InputMemoFragment : Fragment() {
             inputMemoViewModel!!.memoTitle.value = ""
             inputMemoViewModel!!.memoContents.value = ""
             //포커스를 준다
-            loginActivity.showSoftInput(textTitleAllMemo, loginActivity)
+            loginActivity.showSoftInput(textInputUserid, loginActivity)
         }
     }
 
@@ -86,8 +90,16 @@ class InputMemoFragment : Fragment() {
     //유효성 검사
     private fun checkOK():Boolean{
         fragmentInputMemoBinding.apply {
+            val userId = inputMemoViewModel?.userId?.value!!
             val title = inputMemoViewModel?.memoTitle?.value!!
             val contents = inputMemoViewModel?.memoContents?.value!!
+
+            if (userId2 != userId){
+                loginActivity.showDialog("아이디 오류", "아이디가 일치 하지 않습니다"){ dialogInterface: DialogInterface, i: Int ->
+                    loginActivity.showSoftInput(textInputUserid, loginActivity)
+                }
+                return false
+            }
 
             if (title.trim().isEmpty()){
                 loginActivity.showDialog("제목 입력 오류", "제목을 입력해주세요"){ dialogInterface: DialogInterface, i: Int ->
@@ -117,12 +129,13 @@ class InputMemoFragment : Fragment() {
 
             //업로드 할 정보를 담아준다
             val memoIdx = memoSequence + 1
+            val userId = inputMemoViewModel.userId.value!!
             val memoTitle = inputMemoViewModel.memoTitle.value!!
             val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd")
             val date = simpleDateFormat.format(Date())
             val memoContents = inputMemoViewModel.memoContents.value!!
 
-            val memoModel = MemoModel(memoIdx, memoTitle, date, memoContents)
+            val memoModel = MemoModel(memoIdx, userId,memoTitle, date, memoContents)
             MemoDao.insertUserData(memoModel)
 
             loginActivity.removeFragment(FragmentMemoName.INPUT_MEMO_FRAGMENT)

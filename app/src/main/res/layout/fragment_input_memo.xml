@@ -35,6 +35,20 @@
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:hint="아이디"
+            app:endIconMode="clear_text">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/textInputUserid"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@={inputMemoViewModel.userId}"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="13dp"
             android:hint="메모 제목"
             app:endIconMode="clear_text">
 
@@ -42,7 +56,7 @@
                 android:id="@+id/textTitleAllMemo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@={inputMemoViewModel.memoTitle}"/>
+                android:text="@={inputMemoViewModel.memoTitle}" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout

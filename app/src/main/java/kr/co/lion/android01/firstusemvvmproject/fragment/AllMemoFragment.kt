@@ -1,6 +1,7 @@
 package kr.co.lion.android01.firstusemvvmproject.fragment
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -10,14 +11,17 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.divider.MaterialDividerItemDecoration
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kr.co.lion.android01.firstusemvvmproject.FragmentMemoName
 import kr.co.lion.android01.firstusemvvmproject.R
 import kr.co.lion.android01.firstusemvvmproject.activity.LoginActivity
+import kr.co.lion.android01.firstusemvvmproject.dao.MemoDao
 import kr.co.lion.android01.firstusemvvmproject.dao.UserDao
 import kr.co.lion.android01.firstusemvvmproject.databinding.FragmentAllMemoBinding
 import kr.co.lion.android01.firstusemvvmproject.databinding.RowMainBinding
+import kr.co.lion.android01.firstusemvvmproject.model.MemoModel
 import kr.co.lion.android01.firstusemvvmproject.viewModel.AllMemoViewModel
 
 class AllMemoFragment : Fragment() {
@@ -27,8 +31,11 @@ class AllMemoFragment : Fragment() {
 
     lateinit var allMemoViewModel: AllMemoViewModel
 
+    var memoList = mutableListOf<MemoModel>()
+
     //아이디 객체를 담을 변수
     var userId = ""
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
@@ -42,9 +49,11 @@ class AllMemoFragment : Fragment() {
         loginActivity = activity as LoginActivity
         settingToolBar()
         initView()
+        gettingUserData()
 
         return fragmentAllMemoBinding.root
     }
+
 
     //툴바 설정
     private fun settingToolBar(){
@@ -60,7 +69,9 @@ class AllMemoFragment : Fragment() {
                     setOnMenuItemClickListener {
                         when(it.itemId){
                             R.id.addition_memo -> {
-                                loginActivity.replaceFragment(FragmentMemoName.INPUT_MEMO_FRAGMENT, true, true, null)
+                                val bundle = Bundle()
+                                bundle.putString("userId", userId)
+                                loginActivity.replaceFragment(FragmentMemoName.INPUT_MEMO_FRAGMENT, true, true, bundle)
                             }
                             R.id.practice_menu -> {
                                 loginActivity.replaceFragment(FragmentMemoName.SHOW_MEMO_FRAGMENT, true, true, null)
@@ -71,6 +82,17 @@ class AllMemoFragment : Fragment() {
                     }
                 }
             }
+        }
+    }
+
+    //현재 게시판의 데이터를 가져와 메인 화면의 RecyclerView를 갱신한다
+    private fun gettingUserData(){
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main){
+            //서버에서 데이터를 가져온다
+            memoList = MemoDao.gettingMemoList(userId)
+
+            //갱신
+            fragmentAllMemoBinding.memoRecyclerView.adapter?.notifyDataSetChanged()
         }
     }
 
@@ -88,6 +110,7 @@ class AllMemoFragment : Fragment() {
 
     inner class MemoRecyclerView : RecyclerView.Adapter<MemoRecyclerView.ViewHolderClass>(){
 
+
         inner class ViewHolderClass(rowMainBinding: RowMainBinding): RecyclerView.ViewHolder(rowMainBinding.root){
             var rowMainBinding:RowMainBinding
 
@@ -97,6 +120,7 @@ class AllMemoFragment : Fragment() {
                 this.rowMainBinding.root.layoutParams = ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT
+
                 )
             }
         }
@@ -108,12 +132,18 @@ class AllMemoFragment : Fragment() {
         }
 
         override fun getItemCount(): Int {
-            return 100
+            return memoList.size
         }
 
         override fun onBindViewHolder(holder: ViewHolderClass, position: Int) {
-            holder.rowMainBinding.textViewtitleAllMemo.text = "메모"
-            holder.rowMainBinding.textViewDateAllMemo.text = "2024/03/21"
+            Log.d("test1234", "${memoList[position].memoTitle}")
+            holder.rowMainBinding.textViewtitleAllMemo.text = "${memoList[position].memoTitle}"
+            holder.rowMainBinding.textViewDateAllMemo.text = "${memoList[position].date}"
+            holder.rowMainBinding.root.setOnClickListener {
+                val bundle = Bundle()
+                bundle.putInt("memoIdx", memoList[position].memoIdx)
+                loginActivity.replaceFragment(FragmentMemoName.SHOW_MEMO_FRAGMENT, true, true, bundle)
+            }
         }
     }
 }

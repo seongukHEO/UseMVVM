@@ -4,6 +4,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
 class InputMemoViewModel : ViewModel() {
+
+    //유저 아이디
+    var userId = MutableLiveData<String>()
     //메모 제목
     var memoTitle = MutableLiveData<String>()
 

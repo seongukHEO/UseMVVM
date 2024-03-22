@@ -7,9 +7,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kr.co.lion.android01.firstusemvvmproject.FragmentMemoName
 import kr.co.lion.android01.firstusemvvmproject.R
 import kr.co.lion.android01.firstusemvvmproject.activity.LoginActivity
+import kr.co.lion.android01.firstusemvvmproject.dao.MemoDao
 import kr.co.lion.android01.firstusemvvmproject.databinding.FragmentShowMemoBinding
 import kr.co.lion.android01.firstusemvvmproject.showDialog
 import kr.co.lion.android01.firstusemvvmproject.viewModel.ShowMemoViewModel
@@ -21,6 +25,9 @@ class ShowMemoFragment : Fragment() {
 
     lateinit var showMemoViewModel: ShowMemoViewModel
 
+    //메모 idx깂
+    var memoIdx = 0
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
@@ -29,9 +36,12 @@ class ShowMemoFragment : Fragment() {
         fragmentShowMemoBinding.showMemoViewModel = showMemoViewModel
         fragmentShowMemoBinding.lifecycleOwner = this
 
+        memoIdx = arguments?.getInt("memoIdx")!!
+
         loginActivity = activity as LoginActivity
         settingToolBar()
         setEvent()
+        setView()
 
 
         return fragmentShowMemoBinding.root
@@ -71,9 +81,15 @@ class ShowMemoFragment : Fragment() {
     private fun setView(){
         fragmentShowMemoBinding.apply {
             //데배 하면 여기다가 집어넣자
-            showMemoViewModel!!.memoTitle.value = ""
-            showMemoViewModel!!.memoDate.value = ""
-            showMemoViewModel!!.memoContents.value = ""
+
+            val job1 = viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main){
+                //메모 idx를 활용하여 값을 가져온다
+                val memoInfo = MemoDao.gettingMemoByMemoIdx(memoIdx)
+
+                showMemoViewModel!!.memoTitle.value = memoInfo?.memoTitle
+                showMemoViewModel!!.memoDate.value = memoInfo?.date
+                showMemoViewModel!!.memoContents.value = memoInfo?.memoContents
+            }
         }
     }
 
