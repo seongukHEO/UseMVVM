@@ -69,7 +69,10 @@ class ShowMemoFragment : Fragment() {
             }
             buttonDeleteShowMemo.setOnClickListener {
                 loginActivity.showDialog("메모 삭제", "메모를 삭제하시겠습니까?"){ dialogInterface: DialogInterface, i: Int ->
-                    loginActivity.removeFragment(FragmentMemoName.SHOW_MEMO_FRAGMENT)
+                    viewLifecycleOwner.lifecycleScope.launch (Dispatchers.Main){
+                        MemoDao.deleteUserMemo(memoIdx)
+                        loginActivity.removeFragment(FragmentMemoName.SHOW_MEMO_FRAGMENT)
+                    }
                 }
             }
         }

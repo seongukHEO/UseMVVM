@@ -49,6 +49,29 @@ class MemoDao {
             job1.join()
         }
 
+        //사용자 메모를 삭제하는 메서드
+        suspend fun deleteUserMemo(memoIdx: Int){
+            val job1 = CoroutineScope(Dispatchers.IO).launch {
+                //컬렉션에 접근
+                val collectionReference = Firebase.firestore.collection("MemoData")
+                var querySnapshot = collectionReference.whereEqualTo("memoIdx", memoIdx).get().await()
+                for (document in querySnapshot.documents) {
+                    document.reference.delete()
+                }
+            }
+        }
+
+        //사용자 메모를 수정하는 메서드
+        suspend fun updateUserMemo(memoIdx: Int, memoModel: MemoModel){
+            val job1 = CoroutineScope(Dispatchers.IO).launch {
+                val collectionReference = Firebase.firestore.collection("MemoData")
+                val querySnapshot = collectionReference.whereEqualTo("memoidx", memoIdx).get().await()
+                for (document in querySnapshot.documents){
+                    document.reference.update("memoModel", memoModel)
+                }
+            }
+        }
+
         //사용자 정보를 저장하는 메서드를 만들어준다
         suspend fun insertUserData(memoModel: MemoModel){
             val job1 = CoroutineScope(Dispatchers.IO).launch {
