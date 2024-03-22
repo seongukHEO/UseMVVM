@@ -7,14 +7,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kr.co.lion.android01.firstusemvvmproject.FragmentMemoName
 import kr.co.lion.android01.firstusemvvmproject.R
 import kr.co.lion.android01.firstusemvvmproject.activity.LoginActivity
+import kr.co.lion.android01.firstusemvvmproject.dao.MemoDao
 import kr.co.lion.android01.firstusemvvmproject.databinding.FragmentInputMemoBinding
 import kr.co.lion.android01.firstusemvvmproject.hideSoftInput
+import kr.co.lion.android01.firstusemvvmproject.model.MemoModel
 import kr.co.lion.android01.firstusemvvmproject.showDialog
 import kr.co.lion.android01.firstusemvvmproject.showSoftInput
 import kr.co.lion.android01.firstusemvvmproject.viewModel.InputMemoViewModel
+import java.text.SimpleDateFormat
+import java.util.Date
 
 class InputMemoFragment : Fragment() {
 
@@ -58,8 +66,7 @@ class InputMemoFragment : Fragment() {
             buttonAllMemo.setOnClickListener {
                 val chk = checkOK()
                 if (chk == true){
-                    loginActivity.removeFragment(FragmentMemoName.INPUT_MEMO_FRAGMENT)
-                    loginActivity.hideSoftInput(loginActivity)
+                    saveMemo()
                 }
             }
         }
@@ -96,6 +103,30 @@ class InputMemoFragment : Fragment() {
             }
 
             return true
+        }
+    }
+
+    //저장처리
+    private fun saveMemo(){
+
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main){
+            //게시글 시퀀스 값을 업데이트한다
+            val memoSequence = MemoDao.getUserSequence()
+            //시쿼스 값을 업데이트 한다
+            MemoDao.updateSequence(memoSequence + 1)
+
+            //업로드 할 정보를 담아준다
+            val memoIdx = memoSequence + 1
+            val memoTitle = inputMemoViewModel.memoTitle.value!!
+            val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd")
+            val date = simpleDateFormat.format(Date())
+            val memoContents = inputMemoViewModel.memoContents.value!!
+
+            val memoModel = MemoModel(memoIdx, memoTitle, date, memoContents)
+            MemoDao.insertUserData(memoModel)
+
+            loginActivity.removeFragment(FragmentMemoName.INPUT_MEMO_FRAGMENT)
+            loginActivity.hideSoftInput(loginActivity)
         }
     }
 }

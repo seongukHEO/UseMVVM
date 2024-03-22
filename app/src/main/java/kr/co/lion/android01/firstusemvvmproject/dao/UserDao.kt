@@ -52,7 +52,7 @@ class UserDao {
         suspend fun insertUserData(userModel: UserModel){
             val job1 = CoroutineScope(Dispatchers.IO).launch {
                 //컬렉션에 접근할 수 있는 객체를 가져온다
-                val collectionReference = Firebase.firestore.collection("Sequence")
+                val collectionReference = Firebase.firestore.collection("UserData")
                 //컬렉션에 문서를 추가한다
                 //문서를 추가할 때 객체나 맵을 지정한다
                 //추가된 문서 내부의 필드는 객체가 가진 프러퍼티의 이름이나
@@ -69,7 +69,7 @@ class UserDao {
 
             val job1 = CoroutineScope(Dispatchers.IO).launch {
                 //컬렉션에 접근할 수 있는 객체를 가져온다
-                val collectionReference = Firebase.firestore.collection("Sequence")
+                val collectionReference = Firebase.firestore.collection("UserData")
                 //필드의 이름 값 형태로 넣어준다
                 //WhereEqualTo : 같은 것
                 val queryShapshot = collectionReference.whereEqualTo("userId", joinUserId).get().await()
@@ -89,7 +89,7 @@ class UserDao {
 
             val job1 = CoroutineScope(Dispatchers.IO).launch {
                 //UserData 컬렉션 접근 객체
-                val collectionReference = Firebase.firestore.collection("Sequence")
+                val collectionReference = Firebase.firestore.collection("UserData")
                 //number 필드가 매개변수로 들어오는 Number와 같은 문서들을 가져온다
                 val querySnapshot = collectionReference.whereEqualTo("number", number).get().await()
                 //만약 가져온 것이 있다면?
@@ -110,7 +110,7 @@ class UserDao {
 
             val job1 = CoroutineScope(Dispatchers.IO).launch {
                 //UserData 컬렉션 접근 객체
-                val collectionReference = Firebase.firestore.collection("Sequence")
+                val collectionReference = Firebase.firestore.collection("UserData")
                 //userId 필드가 매개변수로 들어오는 userId와 같은 문서들을 가져온다
                 val querySnapshot = collectionReference.whereEqualTo("userId", userid).get().await()
                 //만약 가져온 것이 있다면?
