@@ -65,9 +65,9 @@ class MemoDao {
         suspend fun updateUserMemo(memoIdx: Int, memoModel: MemoModel){
             val job1 = CoroutineScope(Dispatchers.IO).launch {
                 val collectionReference = Firebase.firestore.collection("MemoData")
-                val querySnapshot = collectionReference.whereEqualTo("memoidx", memoIdx).get().await()
+                val querySnapshot = collectionReference.whereEqualTo("memoIdx", memoIdx).get().await()
                 for (document in querySnapshot.documents){
-                    document.reference.update("memoModel", memoModel)
+                    document.reference.set(memoModel)
                 }
             }
         }

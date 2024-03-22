@@ -7,11 +7,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kr.co.lion.android01.firstusemvvmproject.FragmentMemoName
 import kr.co.lion.android01.firstusemvvmproject.R
 import kr.co.lion.android01.firstusemvvmproject.activity.LoginActivity
+import kr.co.lion.android01.firstusemvvmproject.dao.MemoDao
 import kr.co.lion.android01.firstusemvvmproject.databinding.FragmentModifyMemoBinding
 import kr.co.lion.android01.firstusemvvmproject.hideSoftInput
+import kr.co.lion.android01.firstusemvvmproject.model.MemoModel
 import kr.co.lion.android01.firstusemvvmproject.showDialog
 import kr.co.lion.android01.firstusemvvmproject.showSoftInput
 import kr.co.lion.android01.firstusemvvmproject.viewModel.ModifyMemoViewModel
@@ -23,6 +28,8 @@ class ModifyMemoFragment : Fragment() {
 
     lateinit var modifyMemoViewModel: ModifyMemoViewModel
 
+    var memoIdx = 0
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
@@ -30,6 +37,8 @@ class ModifyMemoFragment : Fragment() {
         modifyMemoViewModel = ModifyMemoViewModel()
         fragmentModifyMemoBinding.modifyMemoViewModel = modifyMemoViewModel
         fragmentModifyMemoBinding.lifecycleOwner = this
+
+        memoIdx = arguments?.getInt("memoIdx")!!
 
         loginActivity = activity as LoginActivity
         settingToolBar()
@@ -55,12 +64,18 @@ class ModifyMemoFragment : Fragment() {
     //뷰설정
     private fun settingView(){
         fragmentModifyMemoBinding.apply {
-            modifyMemoViewModel!!.memoTitle.value = ""
-            modifyMemoViewModel!!.memoDate.value = ""
-            modifyMemoViewModel!!.memoContents.value = ""
 
-            //포커스를 준다
-            loginActivity.showSoftInput(textModifyTitle, loginActivity)
+            val job1 = viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main){
+                var memoInfo = MemoDao.gettingMemoByMemoIdx(memoIdx)
+
+                modifyMemoViewModel!!.userId.value = memoInfo?.userId
+                modifyMemoViewModel!!.memoTitle.value = memoInfo?.memoTitle
+                modifyMemoViewModel!!.memoDate.value = memoInfo?.date
+                modifyMemoViewModel!!.memoContents.value = memoInfo?.memoContents
+
+                //포커스를 준다
+                loginActivity.showSoftInput(textModifyTitle, loginActivity)
+            }
         }
     }
 
@@ -71,6 +86,7 @@ class ModifyMemoFragment : Fragment() {
                 val chk = checkOK()
                 if (chk == true){
                     loginActivity.showDialog("메모 수정", "메모를 수정하시겠습니까?"){ dialogInterface: DialogInterface, i: Int ->
+                        updateMemoData()
                         loginActivity.removeFragment(FragmentMemoName.MODIFY_MEMO_FRAGMENT)
                         loginActivity.removeFragment(FragmentMemoName.SHOW_MEMO_FRAGMENT)
                         loginActivity.hideSoftInput(loginActivity)
@@ -100,6 +116,23 @@ class ModifyMemoFragment : Fragment() {
                 return false
             }
             return true
+        }
+    }
+
+    //메모 정보를 업데이트 한다
+    private fun updateMemoData(){
+        fragmentModifyMemoBinding.apply {
+            viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
+                var idx = memoIdx
+                var userId = modifyMemoViewModel!!.userId.value!!
+                var memoTitle = modifyMemoViewModel!!.memoTitle.value!!
+                var date = modifyMemoViewModel!!.memoDate.value!!
+                var memoContents = modifyMemoViewModel!!.memoContents.value!!
+
+                var memoModel = MemoModel(idx, userId ,memoTitle, date, memoContents)
+
+                MemoDao.updateUserMemo(memoIdx, memoModel)
+            }
         }
     }
 }

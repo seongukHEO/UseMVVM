@@ -64,7 +64,9 @@ class ShowMemoFragment : Fragment() {
     private fun setEvent(){
         fragmentShowMemoBinding.apply {
             buttonModifyShowMemo.setOnClickListener {
-                loginActivity.replaceFragment(FragmentMemoName.MODIFY_MEMO_FRAGMENT, true, true, null)
+                val bundle = Bundle()
+                bundle.putInt("memoIdx", memoIdx)
+                loginActivity.replaceFragment(FragmentMemoName.MODIFY_MEMO_FRAGMENT, true, true, bundle)
 
             }
             buttonDeleteShowMemo.setOnClickListener {
