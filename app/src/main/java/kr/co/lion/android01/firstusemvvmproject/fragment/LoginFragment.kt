@@ -46,6 +46,14 @@ class LoginFragment : Fragment() {
         return fragmentLoginBinding.root
     }
 
+    override fun onResume() {
+        super.onResume()
+        fragmentLoginBinding.apply {
+            loginViewModel!!.textMainId.value = ""
+            loginViewModel!!.textMainPw.value = ""
+        }
+    }
+
     //툴바 설정
     private fun settingToolBar(){
         fragmentLoginBinding.apply {

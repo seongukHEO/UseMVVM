@@ -1,5 +1,7 @@
 package kr.co.lion.android01.firstusemvvmproject.fragment
 
+import android.content.DialogInterface
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -11,10 +13,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.divider.MaterialDividerItemDecoration
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kr.co.lion.android01.firstusemvvmproject.FragmentMemoName
+import kr.co.lion.android01.firstusemvvmproject.MainActivity
 import kr.co.lion.android01.firstusemvvmproject.R
 import kr.co.lion.android01.firstusemvvmproject.activity.LoginActivity
 import kr.co.lion.android01.firstusemvvmproject.dao.MemoDao
@@ -22,6 +24,7 @@ import kr.co.lion.android01.firstusemvvmproject.dao.UserDao
 import kr.co.lion.android01.firstusemvvmproject.databinding.FragmentAllMemoBinding
 import kr.co.lion.android01.firstusemvvmproject.databinding.RowMainBinding
 import kr.co.lion.android01.firstusemvvmproject.model.MemoModel
+import kr.co.lion.android01.firstusemvvmproject.showDialog
 import kr.co.lion.android01.firstusemvvmproject.viewModel.AllMemoViewModel
 
 class AllMemoFragment : Fragment() {
@@ -74,7 +77,13 @@ class AllMemoFragment : Fragment() {
                                 loginActivity.replaceFragment(FragmentMemoName.INPUT_MEMO_FRAGMENT, true, true, bundle)
                             }
                             R.id.practice_menu -> {
-                                loginActivity.replaceFragment(FragmentMemoName.SHOW_MEMO_FRAGMENT, true, true, null)
+                                loginActivity.showDialog("회원 탈퇴", "회원탈퇴를 하시겠습니까?\n입력한 메모가 전부 삭제됩니다"){ dialogInterface: DialogInterface, i: Int ->
+                                    viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
+                                        MemoDao.deleteUserMemoByUserId(userId)
+                                        MemoDao.deleteUserInfo(userId)
+                                        loginActivity.finish()
+                                    }
+                                }
                             }
                         }
 
