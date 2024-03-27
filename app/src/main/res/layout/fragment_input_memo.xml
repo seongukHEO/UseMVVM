@@ -74,15 +74,14 @@
                 android:text="@={inputMemoViewModel.memoContents}"/>
         </com.google.android.material.textfield.TextInputLayout>
 
-        <Button
-            android:id="@+id/buttonAllMemo"
+        <ImageView
+            android:id="@+id/imageView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:layout_marginTop="45dp"
-            android:layout_marginRight="20dp"
-            android:backgroundTint="@color/middleColor"
-            android:text="메모 입력" />
+            android:layout_marginTop="15dp"
+            android:adjustViewBounds="true"
+            app:srcCompat="@drawable/panorama_24px" />
+
     </LinearLayout>
 </LinearLayout>
 

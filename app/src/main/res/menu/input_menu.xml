@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/camera_input_menu"
+        android:icon="@drawable/photo_camera_24px"
+        android:title="카메라"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/album_input_menu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:icon="@drawable/photo_album_24px"
+        android:title="엘범"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/done_input_menu"
+        android:icon="@drawable/done_24px"
+        android:title="메모 완료"
+        app:showAsAction="always" />
+</menu>

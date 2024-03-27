@@ -1,5 +1,6 @@
 package kr.co.lion.android01.firstusemvvmproject.activity
 
+import android.Manifest
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.SystemClock
@@ -22,10 +23,17 @@ class LoginActivity : AppCompatActivity() {
     var oldFragment:Fragment? = null
     var newFragment:Fragment? = null
 
+    //확인받을 권한 목록
+    val permissionList = arrayOf(
+        Manifest.permission.READ_EXTERNAL_STORAGE,
+        Manifest.permission.ACCESS_MEDIA_LOCATION
+    )
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         activityLoginBinding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(activityLoginBinding.root)
+        requestPermissions(permissionList, 0)
         val userId = intent.getStringExtra("userId")
         val bundle = Bundle()
         bundle.putString("userId", userId)
