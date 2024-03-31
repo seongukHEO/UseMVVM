@@ -4,16 +4,21 @@ import android.content.Context
 import android.content.DialogInterface
 import android.graphics.Bitmap
 import android.graphics.Matrix
+import android.graphics.drawable.BitmapDrawable
 import android.media.ExifInterface
 import android.net.Uri
 import android.os.Build
 import android.os.SystemClock
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.firebase.Firebase
+import com.google.firebase.storage.storage
 import java.io.File
+import java.io.FileOutputStream
 import kotlin.concurrent.thread
 
 class Data {
@@ -101,6 +106,24 @@ class Data {
             val resizedBitmap = Bitmap.createScaledBitmap(bitmap, targetWidth, targetHeight, false)
 
             return resizedBitmap
+        }
+
+
+        //이미지 뷰의 이미지를 추출하여 로컬에 저장한다
+        fun saveImageViewData(context: Context, imageView: ImageView, fileName:String){
+            //외부 저장소까지의 경로를 가져온다
+            val filePath = context.getExternalFilesDir(null).toString()
+            //이미지 뷰에서 BitmapDrawable 객체를 추출한다
+            val bitmapDrawable = imageView.drawable as BitmapDrawable
+
+            //로컬에 저장할 경로
+            val file = File("${filePath}/${fileName}")
+            //스트림 추출
+            val fileOutputStream = FileOutputStream(file)
+            //이미지를 저장한다
+            bitmapDrawable.bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream)
+            fileOutputStream.flush()
+            fileOutputStream.close()
         }
     }
 

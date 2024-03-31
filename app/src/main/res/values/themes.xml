@@ -18,4 +18,13 @@
         <item name="counterTextAppearance">@color/lastColor</item>
         <item name="hintTextColor">@color/lastColor</item>
     </style>
+
+    <style name="Base.Theme.Seonguk" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowActivityTransitions">true</item>
+        <item name="android:windowFullscreen">true</item>
+    </style>
+
+    <style name="Theme.Seonguk" parent="Base.Theme.Seonguk" />
 </resources>

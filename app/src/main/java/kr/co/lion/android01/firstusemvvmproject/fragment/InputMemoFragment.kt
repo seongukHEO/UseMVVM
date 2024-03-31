@@ -55,6 +55,10 @@ class InputMemoFragment : Fragment() {
     //아이디 객체를 담은 변수
     var userId2 = ""
 
+    //이미지를 첨부한 적이 있는지
+    var isAddPicture = false
+
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
@@ -118,6 +122,7 @@ class InputMemoFragment : Fragment() {
             inputMemoViewModel!!.memoContents.value = ""
             //포커스를 준다
             loginActivity.showSoftInput(textInputUserid, loginActivity)
+            isAddPicture = false
         }
     }
 
@@ -157,6 +162,21 @@ class InputMemoFragment : Fragment() {
     private fun saveMemo(){
 
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main){
+
+            // 서버에서의 첨부 이미지 파일 이름
+            var serverFileName:String? = null
+
+            if (isAddPicture == true){
+                //이미지 뷰의 이미지 데이터를 파일로 저장한다
+                Data.saveImageViewData(loginActivity, fragmentInputMemoBinding.imageView, "uploadTemp.jpg")
+                //서버에서의 파일 이름
+                //시간 단위로 해야 겹치지 않는다
+                serverFileName = "image_${System.currentTimeMillis()}.jpg"
+                //서버로 업로드한다
+                MemoDao.uploadImage(loginActivity, "uploagTemp.jpg", serverFileName)
+            }
+
+
             //게시글 시퀀스 값을 업데이트한다
             val memoSequence = MemoDao.getUserSequence()
             //시쿼스 값을 업데이트 한다
@@ -166,11 +186,12 @@ class InputMemoFragment : Fragment() {
             val memoIdx = memoSequence + 1
             val userId = inputMemoViewModel.userId.value!!
             val memoTitle = inputMemoViewModel.memoTitle.value!!
+            val image = serverFileName
             val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd")
             val date = simpleDateFormat.format(Date())
             val memoContents = inputMemoViewModel.memoContents.value!!
 
-            val memoModel = MemoModel(memoIdx, userId,memoTitle, date, memoContents)
+            val memoModel = MemoModel(memoIdx, userId,memoTitle, image, date, memoContents)
             MemoDao.insertUserData(memoModel)
 
             loginActivity.removeFragment(FragmentMemoName.INPUT_MEMO_FRAGMENT)
@@ -196,8 +217,10 @@ class InputMemoFragment : Fragment() {
 
                 fragmentInputMemoBinding.imageView.setImageBitmap(bitmap3)
 
+                isAddPicture = true
 
-                //사징 파일을 삭제한다
+
+                //사진 파일을 삭제한다
                 var file = File(contentUri.path)
                 file.delete()
 
@@ -262,6 +285,7 @@ class InputMemoFragment : Fragment() {
                     val bitmap3 = resizeBitmap(bitmap2, 1024)
 
                     fragmentInputMemoBinding.imageView.setImageBitmap(bitmap3)
+                    isAddPicture = true
                 }
             }
         }

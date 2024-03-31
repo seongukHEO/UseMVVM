@@ -129,7 +129,7 @@ class ModifyMemoFragment : Fragment() {
                 var date = modifyMemoViewModel!!.memoDate.value!!
                 var memoContents = modifyMemoViewModel!!.memoContents.value!!
 
-                var memoModel = MemoModel(idx, userId ,memoTitle, date, memoContents)
+                var memoModel = MemoModel(idx, userId ,memoTitle, null, date, memoContents)
 
                 MemoDao.updateUserMemo(memoIdx, memoModel)
             }
