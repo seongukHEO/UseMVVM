@@ -25,6 +25,7 @@ import kr.co.lion.android01.firstusemvvmproject.R
 import kr.co.lion.android01.firstusemvvmproject.activity.LoginActivity
 import kr.co.lion.android01.firstusemvvmproject.dao.UserDao
 import kr.co.lion.android01.firstusemvvmproject.databinding.FragmentLoginBinding
+import kr.co.lion.android01.firstusemvvmproject.model.UserModel
 import kr.co.lion.android01.firstusemvvmproject.showDialog
 import kr.co.lion.android01.firstusemvvmproject.showSoftInput
 
@@ -188,7 +189,7 @@ class LoginFragment : Fragment() {
         val TAG = "test1234"
 
         //KaKaoSdk 초기화
-        KakaoSdk.init(mainActivity, "1dddca424232a3415f5d232421cd0d26")
+        KakaoSdk.init(mainActivity, "b18d5d5fe01c6450a1c7ae6a2dd79abf")
 
         // 카카오계정으로 로그인 공통 callback 구성
         // 카카오톡으로 로그인 할 수 없어 카카오계정으로 로그인할 경우 사용됨
@@ -217,7 +218,7 @@ class LoginFragment : Fragment() {
 
                     // 카카오톡에 연결된 카카오계정이 없는 경우, 카카오계정으로 로그인 시도
                     UserApiClient.instance.loginWithKakaoAccount(mainActivity, callback = callback)
-                    Log.d("test1234", Utility.getKeyHash(mainActivity))
+                    Log.d("seong1234", Utility.getKeyHash(mainActivity))
                 } else if (token != null) {
                     Log.i(TAG, "카카오톡으로 로그인 성공 ${token.accessToken}")
 
@@ -233,7 +234,34 @@ class LoginFragment : Fragment() {
                             Log.d(TAG, "닉네임 : ${user.kakaoAccount?.profileNicknameNeedsAgreement}")
                             Log.d(TAG, "프로필사진 : ${user.kakaoAccount?.profile?.thumbnailImageUrl}")
                             Log.d(TAG, "1 : ${user.kakaoAccount?.profile?.nickname}")
-                            Log.d(TAG, "프로필사진 : ${user.kakaoAccount?.profile?.thumbnailImageUrl}")
+                            Log.d(TAG, "폰번호 : ${user.kakaoAccount?.phoneNumber}")
+
+                            viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
+                                //사용자 번호 시퀀스 값을 가져온다
+                                val userSequence = UserDao.getUserSequence()
+                                //시퀀스 값을 1 증가시켜 덮어 씌운다
+                                UserDao.updateUserSequence(userSequence + 1)
+
+                                //저장할 데이터를 가져온다
+                                val userIdx = userSequence + 1
+                                val name = user.kakaoAccount?.profile?.nickname
+                                val number = user.kakaoAccount?.phoneNumber
+                                val userId = user.kakaoAccount?.email
+                                val userPw = user.id.toString()
+
+                                //저장할 데이터를 객체에 담는다
+                                val userModel = UserModel(userIdx, name!!, number!!, userId!!, userPw)
+
+                                //사용자 정보를 저장한다
+                                UserDao.insertUserData(userModel)
+
+                                mainActivity.showDialog("가입 완료", "가입이 완료되었습니다"){ dialogInterface: DialogInterface, i: Int ->
+                                    val newIntent = Intent(mainActivity, LoginActivity::class.java)
+                                    newIntent.putExtra("userId", userId)
+                                    startActivity(newIntent)
+
+                                }
+                            }
                         }
                     }
                 }
