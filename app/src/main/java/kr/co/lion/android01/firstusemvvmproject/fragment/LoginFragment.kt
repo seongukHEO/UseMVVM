@@ -4,12 +4,19 @@ import android.animation.Animator
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
+import com.kakao.sdk.auth.model.OAuthToken
+import com.kakao.sdk.common.KakaoSdk
+import com.kakao.sdk.common.model.ClientError
+import com.kakao.sdk.common.model.ClientErrorCause
+import com.kakao.sdk.common.util.Utility
+import com.kakao.sdk.user.UserApiClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kr.co.lion.android01.firstusemvvmproject.FragmentName
@@ -86,6 +93,9 @@ class LoginFragment : Fragment() {
             buttonMainSearchPW.setOnClickListener {
                 mainActivity.replaceFragment(FragmentName.SEARCH_PW_FRAGMENT, true, true, null)
             }
+            imageView3.setOnClickListener {
+                kakaoLogin()
+            }
         }
     }
 
@@ -141,14 +151,14 @@ class LoginFragment : Fragment() {
     }
 
     //Lottie를 사용하자
-    private fun lottieUse(){
+    private fun lottieUse() {
         fragmentLoginBinding.apply {
             lottieLinearLayout.visibility = View.VISIBLE
             val userId = loginViewModel!!.textMainId.value!!
 
             lottieMain.repeatCount = 0
             lottieMain.loop(false)
-            lottieMain.addAnimatorListener(object : Animator.AnimatorListener{
+            lottieMain.addAnimatorListener(object : Animator.AnimatorListener {
                 override fun onAnimationStart(animation: Animator) {
 
                 }
@@ -172,6 +182,68 @@ class LoginFragment : Fragment() {
             lottieMain.playAnimation()
         }
     }
+
+    fun kakaoLogin(){
+
+        val TAG = "test1234"
+
+        //KaKaoSdk 초기화
+        KakaoSdk.init(mainActivity, "1dddca424232a3415f5d232421cd0d26")
+
+        // 카카오계정으로 로그인 공통 callback 구성
+        // 카카오톡으로 로그인 할 수 없어 카카오계정으로 로그인할 경우 사용됨
+        val callback: (OAuthToken?, Throwable?) -> Unit = { token, error ->
+            if (error != null) {
+                //이 부분에는 로그인이 실패했을 때 처리해라
+                Log.e(TAG, "카카오계정으로 로그인 실패", error)
+            } else if (token != null) {
+                //이 부분에는 로그인에 성공했을 떄의 처리
+                //주로 현재 액티비티를 종료하고 다른 액티비티로 이동함
+                Log.i(TAG, "카카오계정으로 로그인 성공 ${token.accessToken}")
+            }
+        }
+
+        // 카카오톡이 설치되어 있으면 카카오톡으로 로그인, 아니면 카카오계정으로 로그인
+        if (UserApiClient.instance.isKakaoTalkLoginAvailable(mainActivity)) {
+            UserApiClient.instance.loginWithKakaoTalk(mainActivity) { token, error ->
+                if (error != null) {
+                    Log.e(TAG, "카카오톡으로 로그인 실패", error)
+
+                    // 사용자가 카카오톡 설치 후 디바이스 권한 요청 화면에서 로그인을 취소한 경우,
+                    // 의도적인 로그인 취소로 보고 카카오계정으로 로그인 시도 없이 로그인 취소로 처리 (예: 뒤로 가기)
+                    if (error is ClientError && error.reason == ClientErrorCause.Cancelled) {
+                        return@loginWithKakaoTalk
+                    }
+
+                    // 카카오톡에 연결된 카카오계정이 없는 경우, 카카오계정으로 로그인 시도
+                    UserApiClient.instance.loginWithKakaoAccount(mainActivity, callback = callback)
+                    Log.d("test1234", Utility.getKeyHash(mainActivity))
+                } else if (token != null) {
+                    Log.i(TAG, "카카오톡으로 로그인 성공 ${token.accessToken}")
+
+                    // 로그인한 사용자 정보를 가져온다.
+                    // 이 때 accessToken 을 카카오 서버로 전달해야 해야하는데 알아서해준다.
+                    UserApiClient.instance.me { user, error ->
+                        if(error != null){
+                            Log.e(TAG, "사용자 정보를 가져오는데 실패하였습니다", error)
+                        } else if(user != null){
+                            //어떤 사용자인지 알 기 위해선 회원 번호를 가져오면 됨
+                            Log.d(TAG, "회원번호 : ${user.id}")
+                            Log.d(TAG, "이메일 : ${user.kakaoAccount?.email}")
+                            Log.d(TAG, "닉네임 : ${user.kakaoAccount?.profileNicknameNeedsAgreement}")
+                            Log.d(TAG, "프로필사진 : ${user.kakaoAccount?.profile?.thumbnailImageUrl}")
+                            Log.d(TAG, "1 : ${user.kakaoAccount?.profile?.nickname}")
+                            Log.d(TAG, "프로필사진 : ${user.kakaoAccount?.profile?.thumbnailImageUrl}")
+                        }
+                    }
+                }
+            }
+        } else {
+            UserApiClient.instance.loginWithKakaoAccount(mainActivity, callback = callback)
+        }
+    }
+
+
 
 }
 

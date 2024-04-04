@@ -39,6 +39,11 @@ class AllMemoFragment : Fragment() {
     //아이디 객체를 담을 변수
     var userId = ""
 
+    //어댑터
+    val allMemoAdapter: AllMemoAdapter by lazy {
+        AllMemoAdapter()
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
@@ -49,12 +54,27 @@ class AllMemoFragment : Fragment() {
 
         userId = arguments?.getString("userId")!!
 
+        allMemoViewModel.gettingUserData(userId)
+
         loginActivity = activity as LoginActivity
         settingToolBar()
         initView()
-        gettingUserData()
+
+        allMemoViewModel.memoList.observe(viewLifecycleOwner){
+            allMemoAdapter.submitList(it)
+        }
 
         return fragmentAllMemoBinding.root
+    }
+
+    //viewmodel에 mutableLiveData / livedata선언
+    //fragment에서 by viewModels로 뷰모델가져와서 선언해줌.
+    //fragment에서 viewModel.memoList.observe 시작
+    //viewModel에서 api나 room 통해서 데이터가져와서 mutableLivedata에 넣어줌.
+    //observing하고있다가 새로운 데이터 들어오면 adapter에 submitList해줌.
+
+    private fun initViewAdapter(){
+
     }
 
 
@@ -94,21 +114,12 @@ class AllMemoFragment : Fragment() {
         }
     }
 
-    //현재 게시판의 데이터를 가져와 메인 화면의 RecyclerView를 갱신한다
-    private fun gettingUserData(){
-        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main){
-            //서버에서 데이터를 가져온다
-            memoList = MemoDao.gettingMemoList(userId)
-
-            //갱신
-            fragmentAllMemoBinding.memoRecyclerView.adapter?.notifyDataSetChanged()
-        }
-    }
 
     private fun initView(){
         fragmentAllMemoBinding.apply {
             memoRecyclerView.apply {
-                adapter = MemoRecyclerView()
+                
+                adapter = allMemoAdapter
                 layoutManager = LinearLayoutManager(loginActivity)
                 val deco = MaterialDividerItemDecoration(loginActivity, MaterialDividerItemDecoration.VERTICAL)
                 addItemDecoration(deco)
@@ -117,44 +128,6 @@ class AllMemoFragment : Fragment() {
         }
     }
 
-    inner class MemoRecyclerView : RecyclerView.Adapter<MemoRecyclerView.ViewHolderClass>(){
-
-
-        inner class ViewHolderClass(rowMainBinding: RowMainBinding): RecyclerView.ViewHolder(rowMainBinding.root){
-            var rowMainBinding:RowMainBinding
-
-            init {
-                this.rowMainBinding = rowMainBinding
-
-                this.rowMainBinding.root.layoutParams = ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-
-                )
-            }
-        }
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolderClass {
-            var rowMainBinding = RowMainBinding.inflate(layoutInflater)
-            var viewHolder = ViewHolderClass(rowMainBinding)
-            return viewHolder
-        }
-
-        override fun getItemCount(): Int {
-            return memoList.size
-        }
-
-        override fun onBindViewHolder(holder: ViewHolderClass, position: Int) {
-            Log.d("test1234", "${memoList[position].memoTitle}")
-            holder.rowMainBinding.textViewtitleAllMemo.text = "${memoList[position].memoTitle}"
-            holder.rowMainBinding.textViewDateAllMemo.text = "${memoList[position].date}"
-            holder.rowMainBinding.root.setOnClickListener {
-                val bundle = Bundle()
-                bundle.putInt("memoIdx", memoList[position].memoIdx)
-                loginActivity.replaceFragment(FragmentMemoName.SHOW_MEMO_FRAGMENT, true, true, bundle)
-            }
-        }
-    }
 }
 
 

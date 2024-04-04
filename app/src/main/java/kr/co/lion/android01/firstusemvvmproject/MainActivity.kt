@@ -3,9 +3,14 @@ package kr.co.lion.android01.firstusemvvmproject
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.SystemClock
+import android.util.Log
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.google.android.material.transition.MaterialSharedAxis
+import com.kakao.sdk.auth.model.OAuthToken
+import com.kakao.sdk.common.model.ClientError
+import com.kakao.sdk.common.model.ClientErrorCause
+import com.kakao.sdk.user.UserApiClient
 import kr.co.lion.android01.firstusemvvmproject.databinding.ActivityMainBinding
 import kr.co.lion.android01.firstusemvvmproject.fragment.JoinFragment
 import kr.co.lion.android01.firstusemvvmproject.fragment.LoginFragment
@@ -127,6 +132,5 @@ class MainActivity : AppCompatActivity() {
         // 지정한 이름으로 있는 Fragment를 BackStack에서 제거한다.
         supportFragmentManager.popBackStack(name.str, FragmentManager.POP_BACK_STACK_INCLUSIVE)
     }
-
 
 }
