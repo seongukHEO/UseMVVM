@@ -43,6 +43,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@={inputMemoViewModel.userId}"/>
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="카카오 로그인일 경우 이메일을 입력하시오"
+                android:textColor="@color/toolBarColor" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout

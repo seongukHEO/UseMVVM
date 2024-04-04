@@ -23,6 +23,7 @@ class LoginActivity : AppCompatActivity() {
     var oldFragment:Fragment? = null
     var newFragment:Fragment? = null
 
+
     //확인받을 권한 목록
     val permissionList = arrayOf(
         Manifest.permission.READ_EXTERNAL_STORAGE,

@@ -25,6 +25,7 @@ import kr.co.lion.android01.firstusemvvmproject.R
 import kr.co.lion.android01.firstusemvvmproject.activity.LoginActivity
 import kr.co.lion.android01.firstusemvvmproject.dao.UserDao
 import kr.co.lion.android01.firstusemvvmproject.databinding.FragmentLoginBinding
+
 import kr.co.lion.android01.firstusemvvmproject.model.UserModel
 import kr.co.lion.android01.firstusemvvmproject.showDialog
 import kr.co.lion.android01.firstusemvvmproject.showSoftInput
@@ -32,18 +33,22 @@ import kr.co.lion.android01.firstusemvvmproject.showSoftInput
 import kr.co.lion.android01.firstusemvvmproject.viewModel.LoginViewModel
 
 
-
 class LoginFragment : Fragment() {
 
-    lateinit var fragmentLoginBinding:FragmentLoginBinding
+    lateinit var fragmentLoginBinding: FragmentLoginBinding
     lateinit var mainActivity: MainActivity
 
     lateinit var loginViewModel: LoginViewModel
 
+    //아이디 중복 검사
+    var checkUserIdExist = false
+
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+    ): View? {
         // Inflate the layout for this fragment
-        fragmentLoginBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_login, container, false )
+        fragmentLoginBinding =
+            DataBindingUtil.inflate(inflater, R.layout.fragment_login, container, false)
         loginViewModel = LoginViewModel()
         fragmentLoginBinding.loginViewModel = loginViewModel
         fragmentLoginBinding.lifecycleOwner = this
@@ -63,7 +68,7 @@ class LoginFragment : Fragment() {
     }
 
     //툴바 설정
-    private fun settingToolBar(){
+    private fun settingToolBar() {
         fragmentLoginBinding.apply {
             materialToolbar.apply {
                 title = "메모 하세요~"
@@ -72,12 +77,12 @@ class LoginFragment : Fragment() {
     }
 
     //이벤트 설정
-    private fun setEvent(){
+    private fun setEvent() {
         fragmentLoginBinding.apply {
             //로그인 버튼
             buttonMainLogin.setOnClickListener {
                 val chk = checkOK()
-                if (chk == true){
+                if (chk == true) {
                     loginCheck()
                 }
 
@@ -102,19 +107,25 @@ class LoginFragment : Fragment() {
 
 
     // 유효성 검사
-    private fun checkOK():Boolean{
+    private fun checkOK(): Boolean {
         fragmentLoginBinding.apply {
             val userId = loginViewModel!!.textMainId.value!!
             val userPw = loginViewModel!!.textMainPw.value!!
 
-            if (userId.trim().isEmpty()){
-                mainActivity.showDialog("아이디 입력 오류", "아이디를 입력해주세요"){ dialogInterface: DialogInterface, i: Int ->
+            if (userId.trim().isEmpty()) {
+                mainActivity.showDialog(
+                    "아이디 입력 오류",
+                    "아이디를 입력해주세요"
+                ) { dialogInterface: DialogInterface, i: Int ->
                     mainActivity.showSoftInput(textMainId, mainActivity)
                 }
                 return false
             }
-            if (userPw.trim().isEmpty()){
-                mainActivity.showDialog("비밀번호 입력 오류", "비밀번호를 입력해주세요"){ dialogInterface: DialogInterface, i: Int ->
+            if (userPw.trim().isEmpty()) {
+                mainActivity.showDialog(
+                    "비밀번호 입력 오류",
+                    "비밀번호를 입력해주세요"
+                ) { dialogInterface: DialogInterface, i: Int ->
                     mainActivity.showSoftInput(textMainPW, mainActivity)
                 }
                 return false
@@ -124,7 +135,7 @@ class LoginFragment : Fragment() {
     }
 
     //로그인한다
-    private fun loginCheck(){
+    private fun loginCheck() {
         fragmentLoginBinding.apply {
 
             var userId = loginViewModel!!.textMainId.value!!
@@ -133,17 +144,23 @@ class LoginFragment : Fragment() {
             val job1 = viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
                 val loginUserModel = UserDao.getUserDataByUserId(userId)
                 //아이디가 null이라면?
-                if (loginUserModel == null){
-                    mainActivity.showDialog("로그인 오류", "존재 하지 않는 아이디 입니다"){ dialogInterface: DialogInterface, i: Int ->
+                if (loginUserModel == null) {
+                    mainActivity.showDialog(
+                        "로그인 오류",
+                        "존재 하지 않는 아이디 입니다"
+                    ) { dialogInterface: DialogInterface, i: Int ->
                         mainActivity.showSoftInput(textMainId, mainActivity)
                     }
-                }else{
+                } else {
                     //아이디는 유효한데 비번이 틀릴경우
-                    if (userPw != loginUserModel.userPw){
-                        mainActivity.showDialog("로그인 오류", "존재 하지 않는 비밀번호 입니다"){ dialogInterface: DialogInterface, i: Int ->
+                    if (userPw != loginUserModel.userPw) {
+                        mainActivity.showDialog(
+                            "로그인 오류",
+                            "존재 하지 않는 비밀번호 입니다"
+                        ) { dialogInterface: DialogInterface, i: Int ->
                             mainActivity.showSoftInput(textMainPW, mainActivity)
                         }
-                    }else{
+                    } else {
                         lottieUse()
                     }
                 }
@@ -184,7 +201,7 @@ class LoginFragment : Fragment() {
         }
     }
 
-    fun kakaoLogin(){
+    fun kakaoLogin() {
 
         val TAG = "test1234"
 
@@ -225,41 +242,53 @@ class LoginFragment : Fragment() {
                     // 로그인한 사용자 정보를 가져온다.
                     // 이 때 accessToken 을 카카오 서버로 전달해야 해야하는데 알아서해준다.
                     UserApiClient.instance.me { user, error ->
-                        if(error != null){
+                        if (error != null) {
                             Log.e(TAG, "사용자 정보를 가져오는데 실패하였습니다", error)
-                        } else if(user != null){
-                            //어떤 사용자인지 알 기 위해선 회원 번호를 가져오면 됨
-                            Log.d(TAG, "회원번호 : ${user.id}")
-                            Log.d(TAG, "이메일 : ${user.kakaoAccount?.email}")
-                            Log.d(TAG, "닉네임 : ${user.kakaoAccount?.profileNicknameNeedsAgreement}")
-                            Log.d(TAG, "프로필사진 : ${user.kakaoAccount?.profile?.thumbnailImageUrl}")
-                            Log.d(TAG, "1 : ${user.kakaoAccount?.profile?.nickname}")
-                            Log.d(TAG, "폰번호 : ${user.kakaoAccount?.phoneNumber}")
+                        } else if (user != null) {
 
                             viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
-                                //사용자 번호 시퀀스 값을 가져온다
-                                val userSequence = UserDao.getUserSequence()
-                                //시퀀스 값을 1 증가시켜 덮어 씌운다
-                                UserDao.updateUserSequence(userSequence + 1)
 
-                                //저장할 데이터를 가져온다
-                                val userIdx = userSequence + 1
-                                val name = user.kakaoAccount?.profile?.nickname
-                                val number = user.kakaoAccount?.phoneNumber
-                                val userId = user.kakaoAccount?.email
-                                val userPw = user.id.toString()
+                                checkUserIdExist = UserDao.checkUserIdExist(user.kakaoAccount?.email!!)
 
-                                //저장할 데이터를 객체에 담는다
-                                val userModel = UserModel(userIdx, name!!, number!!, userId!!, userPw)
+                                if (checkUserIdExist != false) {
 
-                                //사용자 정보를 저장한다
-                                UserDao.insertUserData(userModel)
+                                    //사용자 번호 시퀀스 값을 가져온다
+                                    val userSequence = UserDao.getUserSequence()
+                                    //시퀀스 값을 1 증가시켜 덮어 씌운다
+                                    UserDao.updateUserSequence(userSequence + 1)
 
-                                mainActivity.showDialog("가입 완료", "가입이 완료되었습니다"){ dialogInterface: DialogInterface, i: Int ->
+
+                                    //저장할 데이터를 가져온다
+                                    val userIdx = userSequence + 1
+                                    val name = user.kakaoAccount?.profile?.nickname
+                                    val number = user.kakaoAccount?.phoneNumber
+                                    val userId = user.kakaoAccount?.email
+                                    val userPw = user.id.toString()
+
+                                    checkUserIdExist = UserDao.checkUserIdExist(userId!!)
+
+
+                                    //저장할 데이터를 객체에 담는다
+                                    val userModel =
+                                        UserModel(userIdx, name!!, number!!, userId!!, userPw)
+
+                                    //사용자 정보를 저장한다
+                                    UserDao.insertUserData(userModel)
+
+                                    mainActivity.showDialog(
+                                        "가입 완료",
+                                        "가입이 완료되었습니다"
+                                    ) { dialogInterface: DialogInterface, i: Int ->
+                                        val newIntent =
+                                            Intent(mainActivity, LoginActivity::class.java)
+                                        newIntent.putExtra("userId", userId)
+                                        startActivity(newIntent)
+
+                                    }
+                                }else{
                                     val newIntent = Intent(mainActivity, LoginActivity::class.java)
-                                    newIntent.putExtra("userId", userId)
+                                    newIntent.putExtra("userId", user.kakaoAccount?.email)
                                     startActivity(newIntent)
-
                                 }
                             }
                         }
@@ -270,7 +299,6 @@ class LoginFragment : Fragment() {
             UserApiClient.instance.loginWithKakaoAccount(mainActivity, callback = callback)
         }
     }
-
 
 
 }
