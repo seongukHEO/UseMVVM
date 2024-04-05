@@ -10,9 +10,12 @@ import kr.co.lion.android01.firstusemvvmproject.dao.MemoDao
 import kr.co.lion.android01.firstusemvvmproject.databinding.RowMainBinding
 import kr.co.lion.android01.firstusemvvmproject.model.MemoModel
 
-class AllMemoAdapter : RecyclerView.Adapter<ViewHolderClass>() {
+class AllMemoAdapter() : RecyclerView.Adapter<ViewHolderClass>() {
 
     var memoList = listOf<MemoModel>()
+
+    private lateinit var itemClickListener:ItemOnClickListener
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolderClass {
 
         val layoutInflater = LayoutInflater.from(parent.context)
@@ -22,13 +25,15 @@ class AllMemoAdapter : RecyclerView.Adapter<ViewHolderClass>() {
         return viewHolder
     }
 
-    override fun onBindViewHolder(holder: ViewHolderClass, position: Int) {
-        holder.rowMainBinding.textViewtitleAllMemo.text = "${memoList[position].memoTitle}"
-        holder.rowMainBinding.textViewDateAllMemo.text = "${memoList[position].date}"
+    fun setRecyclerClickListener(itemClickListener:ItemOnClickListener){
+        this.itemClickListener = itemClickListener
+    }
+
+    override fun onBindViewHolder(holder: ViewHolderClass, position: Int)  {
+        holder.rowMainBinding.textViewtitleAllMemo.text = memoList[position].memoTitle
+        holder.rowMainBinding.textViewDateAllMemo.text = memoList[position].date
         holder.rowMainBinding.root.setOnClickListener {
-//            val bundle = Bundle()
-//            bundle.putInt("memoIdx", memoList[position].memoIdx)
-//            loginActivity.replaceFragment(FragmentMemoName.SHOW_MEMO_FRAGMENT, true, true, bundle)
+            itemClickListener.recyclerClickListener(memoList[position].memoIdx)
         }
     }
 
@@ -42,8 +47,10 @@ class AllMemoAdapter : RecyclerView.Adapter<ViewHolderClass>() {
         notifyDataSetChanged()
     }
 
+    interface ItemOnClickListener{
+        fun recyclerClickListener(position: Int)
+    }
 }
-
 
 
 class ViewHolderClass(rowMainBinding: RowMainBinding): RecyclerView.ViewHolder(rowMainBinding.root){

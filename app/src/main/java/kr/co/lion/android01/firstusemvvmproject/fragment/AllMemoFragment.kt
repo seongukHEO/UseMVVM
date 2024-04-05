@@ -34,15 +34,23 @@ class AllMemoFragment : Fragment() {
 
     lateinit var allMemoViewModel: AllMemoViewModel
 
-    var memoList = mutableListOf<MemoModel>()
 
     //아이디 객체를 담을 변수
     var userId = ""
 
-    //어댑터
+    // 어댑터
     val allMemoAdapter: AllMemoAdapter by lazy {
-        AllMemoAdapter()
+        val adapter = AllMemoAdapter()
+        adapter.setRecyclerClickListener(object : AllMemoAdapter.ItemOnClickListener{
+            override fun recyclerClickListener(position: Int) {
+                val bundle = Bundle()
+                bundle.putInt("memoIdx", position)
+                loginActivity.replaceFragment(FragmentMemoName.SHOW_MEMO_FRAGMENT, true,true,bundle)
+            }
+        })
+        adapter // setRecyclerClickListener 호출 후 어댑터 인스턴스 반환
     }
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -64,6 +72,9 @@ class AllMemoFragment : Fragment() {
             allMemoAdapter.submitList(it)
         }
 
+        settingRecyclerview()
+
+
         return fragmentAllMemoBinding.root
     }
 
@@ -73,9 +84,7 @@ class AllMemoFragment : Fragment() {
     //viewModel에서 api나 room 통해서 데이터가져와서 mutableLivedata에 넣어줌.
     //observing하고있다가 새로운 데이터 들어오면 adapter에 submitList해줌.
 
-    private fun initViewAdapter(){
 
-    }
 
 
     //툴바 설정
@@ -126,6 +135,10 @@ class AllMemoFragment : Fragment() {
 
             }
         }
+    }
+
+    private fun settingRecyclerview(){
+
     }
 
 }
