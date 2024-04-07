@@ -173,7 +173,7 @@ class InputMemoFragment : Fragment() {
                 //시간 단위로 해야 겹치지 않는다
                 serverFileName = "image_${System.currentTimeMillis()}.jpg"
                 //서버로 업로드한다
-                MemoDao.uploadImage(loginActivity, "uploagTemp.jpg", serverFileName)
+                MemoDao.uploadImage(loginActivity, "uploadTemp.jpg", serverFileName)
             }
 
 

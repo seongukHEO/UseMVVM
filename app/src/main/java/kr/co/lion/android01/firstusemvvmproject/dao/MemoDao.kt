@@ -201,7 +201,7 @@ class MemoDao {
                 //이미지의 주소를 가지고 있는 Uri객체를 받아온다
                 val imageUri = storageRef.downloadUrl.await()
                 //이미지 데이터를 받아와 이미지 뷰에 보여준다
-                val job2 = CoroutineScope(Dispatchers.IO).launch {
+                val job2 = CoroutineScope(Dispatchers.Main).launch {
                     Glide.with(context).load(imageUri).into(imageView)
                     //이미지 뷰가 나타나게 한다
                     imageView.visibility = View.VISIBLE

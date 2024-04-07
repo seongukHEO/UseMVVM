@@ -1,6 +1,7 @@
 package kr.co.lion.android01.firstusemvvmproject.fragment
 
 import android.content.DialogInterface
+import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -15,6 +16,7 @@ import kr.co.lion.android01.firstusemvvmproject.R
 import kr.co.lion.android01.firstusemvvmproject.activity.LoginActivity
 import kr.co.lion.android01.firstusemvvmproject.dao.MemoDao
 import kr.co.lion.android01.firstusemvvmproject.databinding.FragmentShowMemoBinding
+import kr.co.lion.android01.firstusemvvmproject.model.MemoModel
 import kr.co.lion.android01.firstusemvvmproject.showDialog
 import kr.co.lion.android01.firstusemvvmproject.viewModel.ShowMemoViewModel
 
@@ -94,6 +96,11 @@ class ShowMemoFragment : Fragment() {
                 showMemoViewModel!!.memoTitle.value = memoInfo?.memoTitle
                 showMemoViewModel!!.memoDate.value = memoInfo?.date
                 showMemoViewModel!!.memoContents.value = memoInfo?.memoContents
+
+                if(memoInfo?.image != null){
+                    MemoDao.gettingContentImage(loginActivity, memoInfo.image!!, fragmentShowMemoBinding.imageShowInfo)
+
+                }
             }
         }
     }

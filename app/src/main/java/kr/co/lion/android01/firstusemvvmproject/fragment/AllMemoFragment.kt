@@ -68,11 +68,7 @@ class AllMemoFragment : Fragment() {
         settingToolBar()
         initView()
 
-        allMemoViewModel.memoList.observe(viewLifecycleOwner){
-            allMemoAdapter.submitList(it)
-        }
-
-        settingRecyclerview()
+        initAdapter()
 
 
         return fragmentAllMemoBinding.root
@@ -85,6 +81,11 @@ class AllMemoFragment : Fragment() {
     //observing하고있다가 새로운 데이터 들어오면 adapter에 submitList해줌.
 
 
+    private fun initAdapter(){
+        allMemoViewModel.memoList.observe(viewLifecycleOwner){
+            allMemoAdapter.submitList(it)
+        }
+    }
 
 
     //툴바 설정
@@ -136,11 +137,6 @@ class AllMemoFragment : Fragment() {
             }
         }
     }
-
-    private fun settingRecyclerview(){
-
-    }
-
 }
 
 
