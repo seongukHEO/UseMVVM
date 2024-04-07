@@ -59,6 +59,7 @@ class AllMemoFragment : Fragment() {
         allMemoViewModel = AllMemoViewModel()
         fragmentAllMemoBinding.allMemoViewModel = allMemoViewModel
         fragmentAllMemoBinding.lifecycleOwner = this
+        initAdapter()
 
         userId = arguments?.getString("userId")!!
 
@@ -67,9 +68,6 @@ class AllMemoFragment : Fragment() {
         loginActivity = activity as LoginActivity
         settingToolBar()
         initView()
-
-        initAdapter()
-
 
         return fragmentAllMemoBinding.root
     }
@@ -80,6 +78,10 @@ class AllMemoFragment : Fragment() {
     //viewModel에서 api나 room 통해서 데이터가져와서 mutableLivedata에 넣어줌.
     //observing하고있다가 새로운 데이터 들어오면 adapter에 submitList해줌.
 
+    override fun onResume() {
+        super.onResume()
+        initAdapter()
+    }
 
     private fun initAdapter(){
         allMemoViewModel.memoList.observe(viewLifecycleOwner){

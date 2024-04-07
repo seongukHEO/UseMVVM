@@ -211,6 +211,32 @@ class MemoDao {
             job1.join()
         }
 
+        //글 정보를 수정한다
+        suspend fun updateMemoData(memoModel: MemoModel, isRemoveImage:Boolean){
+            val job1 = CoroutineScope(Dispatchers.IO).launch {
+                //컬렉션 접근할 수 있는 객체를 가져온다
+                val collectionReference = Firebase.firestore.collection("MemoData")
+                //컬렉션이 가지고 있는 문서들 중에 수정할 글 정보를 가져온다
+                val query = collectionReference.whereEqualTo("memoIdx", memoModel.memoIdx).get().await()
+
+                //저장할 데이터를 담을 HashMap을 만들어준다
+                val map = mutableMapOf<String, Any?>()
+                map["memoTitle"] = memoModel.memoTitle
+                map["memoContents"] = memoModel.memoContents
+
+                if (memoModel.image != null){
+                    map["image"] = memoModel.image!!
+                }
+                //사용자가 이미지를 삭제했다면
+                if (isRemoveImage == true){
+                    map["image"] = null
+                }
+                //저장한다
+                query.documents[0].reference.update(map)
+            }
+            job1.join()
+        }
+
     }
 }
 
