@@ -87,6 +87,12 @@
                 android:layout_marginTop="10dp"
                 app:srcCompat="@drawable/kakao_login" />
 
+            <ImageView
+                android:id="@+id/imageNaver"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/naver_btn_green" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

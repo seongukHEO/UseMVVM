@@ -51,14 +51,17 @@ class ModifyMemoFragment : Fragment() {
     //이미지를 첨부한 적이 있는지
     var isAddPicture = false
 
-    var resetImage: Bitmap? = null
-
     var memoIdx = 0
 
     // 사용자에 의해서 이미지가 변경되었는지..
     var isChangeImage = false
     // 사용자가 이미지를 삭제했는지
     var isRemoveImage = false
+
+    var resetTitle = ""
+    var resetContent = ""
+    var date = ""
+    var resetImage: Bitmap? = null
 
 
     override fun onCreateView(
@@ -103,13 +106,7 @@ class ModifyMemoFragment : Fragment() {
                         }
                         R.id.reset_modify_menu -> {
                             loginActivity.showDialog("메모 초기화", "메모를 초기화 하시겠습니까?"){ dialogInterface: DialogInterface, i: Int ->
-                                modifyMemoViewModel!!.memoTitle.value = ""
-                                modifyMemoViewModel!!.memoContents.value = ""
-
-                                // 이미지 데이터를 불러온다.
-                                if(resetImage != null) {
-                                    fragmentModifyMemoBinding.imageView4.setImageBitmap(resetImage)
-                                }
+                                resetInputForm()
 
                                 // 사용자가 이미지를 변경했는지의 값을 초기화한다.
                                 isChangeImage = false
@@ -128,26 +125,39 @@ class ModifyMemoFragment : Fragment() {
     private fun settingView(){
         fragmentModifyMemoBinding.apply {
 
-            val job1 = viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main){
+            viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main){
                 var memoInfo = MemoDao.gettingMemoByMemoIdx(memoIdx)
 
-                modifyMemoViewModel!!.userId.value = memoInfo?.userId
-                modifyMemoViewModel!!.memoTitle.value = memoInfo?.memoTitle
-                modifyMemoViewModel!!.memoDate.value = memoInfo?.date
-                modifyMemoViewModel!!.memoContents.value = memoInfo?.memoContents
+                resetTitle = memoInfo?.memoTitle!!
+                resetContent = memoInfo?.memoContents!!
+                date = memoInfo?.date!!
 
-                // 이미지 데이터를 불러온다.
-                // 이미지 데이터를 불러온다.
-                if(memoInfo?.image != null) {
+                //가져온 데이터를 보여준다
+                modifyMemoViewModel!!.userId.value = memoInfo.userId
+                modifyMemoViewModel!!.memoTitle.value = resetTitle
+                modifyMemoViewModel!!.memoContents.value = resetContent
+                modifyMemoViewModel!!.memoDate.value = date
+
+                //이미지 데이터를 불러온다
+                if (memoInfo.image != null){
                     MemoDao.gettingContentImage(loginActivity, memoInfo.image!!, fragmentModifyMemoBinding.imageView4)
 
                     //이미지 뷰로부터 이미지를 가져와 초기화를 위하누프러퍼티에 담아준다
                     val bitmapDrawable = fragmentModifyMemoBinding.imageView4.drawable as BitmapDrawable
                     resetImage = bitmapDrawable.bitmap
-
                 }
-
             }
+        }
+    }
+
+    private fun resetInputForm(){
+        //가져온 데이터를 보여준다
+        modifyMemoViewModel.memoTitle.value = resetTitle
+        modifyMemoViewModel.memoContents.value = resetContent
+
+        //이미지 데이터를 불러온다
+        if (resetImage != null){
+            fragmentModifyMemoBinding.imageView4.setImageBitmap(resetImage)
         }
     }
 
@@ -167,6 +177,8 @@ class ModifyMemoFragment : Fragment() {
             }
             buttonDeletePicture.setOnClickListener {
                 fragmentModifyMemoBinding.imageView4.setImageResource(R.drawable.panorama_24px)
+                isChangeImage = true
+                isRemoveImage = true
             }
         }
     }
@@ -198,29 +210,26 @@ class ModifyMemoFragment : Fragment() {
     private fun updateMemoData(){
             viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
 
-                var serverImage: String? = null
+                var serverFileName:String? = null
 
                 if (isChangeImage == true && isRemoveImage == false){
                     Data.saveImageViewData(loginActivity, fragmentModifyMemoBinding.imageView4, "uploadTemp.jpg")
+
+                    //서버에서의 파일 이름
+                    serverFileName = "image_${System.currentTimeMillis()}.jpg"
+                    //서버에 업로드한다
+                    MemoDao.uploadImage(loginActivity, "uploadTemp.jpg", serverFileName)
                 }
 
-                //서버에서의 파일 이름
-                serverImage = "image_${System.currentTimeMillis()}.jpg"
-                //서버에 업로드한다
-                MemoDao.uploadImage(loginActivity, "uploadTemp.jpg", serverImage)
-
-
-                var idx = memoIdx
                 var userId = modifyMemoViewModel!!.userId.value!!
                 var memoTitle = modifyMemoViewModel!!.memoTitle.value!!
-                var date = modifyMemoViewModel!!.memoDate.value!!
                 var memoContents = modifyMemoViewModel!!.memoContents.value!!
 
-                var memoModel = MemoModel(idx, userId ,memoTitle, null, date, memoContents)
+                var memoModel = MemoModel(memoIdx, userId ,memoTitle, null, "", memoContents)
 
                 //업로드된 이미지가 있다면
-                if (serverImage != null){
-                    memoModel.image = serverImage
+                if (serverFileName != null){
+                    memoModel.image = serverFileName
                 }
 
                 MemoDao.updateMemoData(memoModel, isRemoveImage)
@@ -245,13 +254,13 @@ class ModifyMemoFragment : Fragment() {
 
                 fragmentModifyMemoBinding.imageView4.setImageBitmap(bitmap3)
 
-                isAddPicture = true
+                isChangeImage = true
 
 
                 //사진 파일을 삭제한다
                 var file = File(contentUri.path)
                 file.delete()
-                isChangeImage = true
+
 
             }
 
@@ -314,7 +323,7 @@ class ModifyMemoFragment : Fragment() {
                     val bitmap3 = Data.resizeBitmap(bitmap2, 1024)
 
                     fragmentModifyMemoBinding.imageView4.setImageBitmap(bitmap3)
-                    isAddPicture = true
+                    isChangeImage = true
                 }
             }
         }

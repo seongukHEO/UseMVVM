@@ -130,7 +130,7 @@ class JoinFragment : Fragment() {
             val userPw = joinViewModel!!.textJoinPw.value!!
 
             //이름
-            if (name.trim().isEmpty()) {
+            if (name.isNullOrEmpty()) {
                 textJoinNameLayout.error = "이름을 입력해주세요"
                 if (errorText == null) {
                     errorText = textJoinName

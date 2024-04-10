@@ -1,9 +1,12 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("kotlin-kapt")
     id("com.google.gms.google-services")
 }
+
 
 android {
     namespace = "kr.co.lion.android01.firstusemvvmproject"
@@ -17,6 +20,8 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+
     }
 
     buildTypes {
@@ -58,5 +63,7 @@ dependencies {
     implementation("com.github.bumptech.glide:glide:4.16.0")
     implementation("com.kakao.sdk:v2-user:2.20.1")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
+    implementation("com.navercorp.nid:oauth:5.9.1") // jdk 11
+
 
 }
