@@ -334,12 +334,61 @@ class LoginFragment : Fragment() {
             }
 
             override fun onSuccess(result: NidProfileResponse) {
+                viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
+
+                    checkUserIdExist = UserDao.checkUserIdExist(result.profile?.email!!)
+
+                    if (checkUserIdExist != false) {
+
+                        //사용자 번호 시퀀스 값을 가져온다
+                        val userSequence = UserDao.getUserSequence()
+                        //시퀀스 값을 1 증가시켜 덮어 씌운다
+                        UserDao.updateUserSequence(userSequence + 1)
+
+
+                        //저장할 데이터를 가져온다
+                        val userIdx = userSequence + 1
+                        val name = result.profile?.name
+                        val number = result.profile?.mobile
+                        val userId = result.profile?.email
+                        val userPw = result.profile?.id
+
+                        checkUserIdExist = UserDao.checkUserIdExist(userId!!)
+
+
+                        //저장할 데이터를 객체에 담는다
+                        val userModel =
+                            UserModel(userIdx, name!!, number!!, userId!!, userPw!!)
+
+                        //사용자 정보를 저장한다
+                        UserDao.insertUserData(userModel)
+
+                        mainActivity.showDialog(
+                            "가입 완료",
+                            "가입이 완료되었습니다"
+                        ) { dialogInterface: DialogInterface, i: Int ->
+                            val newIntent =
+                                Intent(mainActivity, LoginActivity::class.java)
+                            newIntent.putExtra("userId", userId)
+                            startActivity(newIntent)
+
+                        }
+                    }else{
+                        val newIntent = Intent(mainActivity, LoginActivity::class.java)
+                        newIntent.putExtra("userId", result.profile?.email!!)
+                        startActivity(newIntent)
+                    }
+                }
+
+
+
+
                 Toast.makeText(mainActivity, "성공", Toast.LENGTH_SHORT).show()
                 Log.d("test1234", "토큰 : ${naverToken}")
-                Log.d("test1234", "아이디 : ${result.profile?.id}")
-                Log.d("test1234", "이메일 : ${result.profile?.email}")
-                Log.d("test1234", "번호 : ${result.profile?.mobile}")
-                Log.d("test1234", "이름 : ${result.profile?.name}")
+                Log.d("test1234", "아이디 : ${result.profile?.id}") //비번
+                Log.d("test1234", "이메일 : ${result.profile?.email}") //아이디
+                Log.d("test1234", "번호 : ${result.profile?.mobile}") //폰 번호
+                Log.d("test1234", "이름 : ${result.profile?.name}") //이름
                 Log.d("test1234", "닉네임 : ${result.profile?.nickname}")
                 Log.d("test1234", "몰라1 : ${result.profile?.ci}")
                 Log.d("test1234", "몰라2 : ${result.profile?.encId}")
